@@ -1,5 +1,12 @@
 # mongo-query-example
 
+## Generate _id as string object Id
+
+```
+ [BsonId(IdGenerator = typeof(StringObjectIdGenerator))]
+ public string Id { get; set; }
+```
+
 # Create a collection ("EmployeeDetail") and insert sample records
 
 ```
