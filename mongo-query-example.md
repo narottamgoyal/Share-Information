@@ -171,6 +171,22 @@ db.getCollection('EmployeeDetail').createIndex({
 })
 ```
 
+# Add new field to any array
+
+```
+db.yourCollection.update(
+  {},
+  {
+    $set: {
+      "subNames.$[].field": 'value'
+    }
+  },
+  {
+    multi: true
+  }
+)
+```
+
 # Rename Field
 
 ```
