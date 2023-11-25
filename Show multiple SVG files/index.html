@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SVG Viewer</title>
+    <style>
+      #svg-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 10px; /* Adjust the gap between items */
+      }
+
+      .svg-item {
+        width: 100%; /* Use 100% width to fill the grid cell */
+        height: auto; /* Automatically adjust height based on aspect ratio */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>SVG Viewer</h1>
+
+    <div id="svg-container"></div>
+
+    <script>
+      // Replace 'path/to/svg/folder' with the correct path to your SVG folder
+      const folderPath = "/svg_files";
+
+      // List of SVG file names
+      const svgFiles = ["bathroom.svg", "birthday.svg"];
+
+      // Function to load and display SVG files
+      function loadSVGs() {
+        const svgContainer = document.getElementById("svg-container");
+
+        svgFiles.forEach(async (file) => {
+          try {
+            const response = await fetch(`${folderPath}/${file}`);
+            const svgContent = await response.text();
+
+            const div = document.createElement("div");
+            div.className = "svg-item";
+            div.innerHTML = svgContent;
+            svgContainer.appendChild(div);
+          } catch (error) {
+            console.error(`Error loading SVG file ${file}:`, error);
+          }
+        });
+      }
+
+      // Call the function when the page loads
+      loadSVGs();
+    </script>
+  </body>
+</html>
