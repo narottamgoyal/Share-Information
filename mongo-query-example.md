@@ -37,7 +37,7 @@ db.getCollection('EmployeeDetail').find({}).noCursorTimeout().forEach(function (
 ```
 db.getCollection('EmployeeDetail').find({}).forEach(function (record) {
   var objectId = record._id;
-  record._id = record._id.valueOf();
+  record._id = record._id.toString();
   if (typeof objectId === 'object') {
     // duplicate same record with string type id
     db.getCollection('EmployeeDetail').insert(record);
