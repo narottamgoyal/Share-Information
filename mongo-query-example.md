@@ -45,7 +45,7 @@ db.getCollection('EmployeeDetail').find({}).forEach(function (record) {
     db.getCollection('EmployeeDetail').remove({
       _id: objectId
     });
-    print("Name: " + record.Name)
+    print("Name: " + record._id)
   }
 })
 ```
