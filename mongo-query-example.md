@@ -17,6 +17,21 @@
 { "Name" : "E", "Mobile" : "456" , "Salary" : 500 , "Department":[]}
 ```
 
+# Search document wwhere _id ends with
+```
+db.getCollection("SupportTicket").find({ "_id": { $regex: /b2879c7ed3$/ } });
+```
+
+# Search document where _id matching with substring of id
+```
+db.yourCollectionName.find({ "_id": { $regex: "b2879c7ed3$" } });
+```
+
+```
+var idEndingPattern = "b2879c7ed3";
+db.yourCollectionName.find({ "_id": { $regex: idEndingPattern + "$" } });
+```
+
 # Foreach
 
 ```
