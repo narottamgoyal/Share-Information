@@ -340,3 +340,27 @@ db.getCollection('EmployeeDetail').find({}).skip(1).limit(2)
 db.getMongo().getDB("MongoQueryDemo").getCollection('EmployeeDetail').find({})
 
 ```
+
+# Update nested array or subarray of document
+
+### Update specific item in subarray
+
+```
+db.getCollection("BidDetails").updateOne(
+    { "_id" : "65ab327fda246cb73088b15a", "serviceProviderResponses.isQuoteAccepted": null }, 
+    {
+       "$set": { "serviceProviderResponses.$.isQuoteAccepted": true } 
+    }
+)
+```
+
+### Update all item of subarray
+
+```
+db.getCollection("BidDetails").updateOne(
+    { "_id" : "65ab327fda246cb73088b15a", "serviceProviderResponses.isQuoteAccepted": null }, 
+    {
+       "$set": { "serviceProviderResponses.$[].isQuoteAccepted": true } 
+    }
+)
+```
