@@ -364,3 +364,11 @@ db.getCollection("BidDetails").updateOne(
     }
 )
 ```
+
+### Create unique index but ignore null values
+```
+db.collectionName.createIndex(
+   {houseName: 1},
+   {unique: true, partialFilterExpression: {houseName: {$type: "string"}}}
+);
+```
