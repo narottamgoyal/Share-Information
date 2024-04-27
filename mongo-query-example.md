@@ -32,6 +32,18 @@ var idEndingPattern = "b2879c7ed3";
 db.yourCollectionName.find({ "_id": { $regex: idEndingPattern + "$" } });
 ```
 
+# Project limited property / field
+
+// Include only the "version" and "email" fields
+```
+db.getCollection("User").find({}, { emailId: 1, version: 1 })
+```
+
+// Exclude the "password" field
+```
+db.getCollection("User").find({}, { password: 0 })
+```
+
 # Foreach
 
 ```
