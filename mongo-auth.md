@@ -2,10 +2,11 @@
 
 ### Start MongoDB without Authentication
 
-Comment security section
+Comment security section in **mongod.cfg**
 
 ```
 #security:
+#  authorization: "enabled"
 ```
 
 or start MongoDB without the --auth option to create the first user.
@@ -112,6 +113,10 @@ db.updateUser("yourUser", { pwd: "yourPassword1" })
 use TestDb
 db.dropUser("userNameToDelete")
 ```
+
+## Forget the MongoDB admin password
+
+You can reset it, but this process requires stopping the MongoDB server and restarting it in a special mode (--auth disabled) to reset the password. Or comment security section in **mongod.cfg**
 
 ## Connection string
 
