@@ -138,12 +138,12 @@ mongodb://dbUser:dbPassword@localhost:27017/myDatabase
 
 ## Robo 3t
 
-![Robo-3t](../mongo-auth/robo-3t-1.png)
+![Robo-3t](./mongo-auth/robo-3t-1.png)
 
-![Robo-3t](../mongo-auth/robo-3t-2.png)
+![Robo-3t](./mongo-auth/robo-3t-2.png)
 
 ## Studio 3t
 
-![Studio-3t](../mongo-auth/Studio-3t-1.png)
+![Studio-3t](./mongo-auth/Studio-3t-1.png)
 
-![Studio-3t](../mongo-auth/Studio-3t-2.png)
+![Studio-3t](./mongo-auth/Studio-3t-2.png)
