@@ -217,12 +217,10 @@ db.yourCollection.update(
 # Rename Field
 
 ```
-db.getCollection('EmployeeDetail').update({
-}, {
-  $rename: {
-    Department: 'Dept'
-  }
-}, false, true)
+db.getCollection('EmployeeDetail').updateMany(
+   {},
+   { $rename: { "oldFieldName": "newFieldName" } }
+)
 ```
 
 # Update Row
