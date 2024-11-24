@@ -375,6 +375,11 @@ db.getCollection("BidDetails").updateOne(
 )
 ```
 
+```
+  var update = Builders<BidDetails>.Update
+  .Set("serviceProviderResponses.$[].isQuoteAccepted", true);
+```
+
 ### Create unique index but ignore null values
 ```
 db.collectionName.createIndex(
