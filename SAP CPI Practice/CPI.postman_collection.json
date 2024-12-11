@@ -1,0 +1,187 @@
+{
+	"info": {
+		"_postman_id": "51eb65be-080b-46c2-92c3-4b0c802fdafb",
+		"name": "CPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13525505"
+	},
+	"item": [
+		{
+			"name": "CPI-Demo",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "=",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "CustomHeader",
+						"value": "CustomHeaderValue",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "Name,Cost,Type\r\nApple,80.00,Fruit\r\nBanana,50.00,Fruit\r\nOrange,95.00,Fruit\r\nPen,32.00,Stationery\r\nPencil,16.00,Stationery\r\nEraser,19.00,Stationery\r\nMilk,190.00,Grocery\r\nBread,125.00,Grocery\r\nEggs,158.00,Grocery\r\nCheese,238.00,Grocery",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://479d32d2trial.it-cpitrial03-rt.cfapps.ap21.hana.ondemand.com/http/input/txt",
+					"protocol": "https",
+					"host": [
+						"479d32d2trial",
+						"it-cpitrial03-rt",
+						"cfapps",
+						"ap21",
+						"hana",
+						"ondemand",
+						"com"
+					],
+					"path": [
+						"http",
+						"input",
+						"txt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "iflow-practice",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "=",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "routeName",
+						"value": "default",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "IteratingSplitter",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "GeneralSplitter",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "Loop",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "HttpException",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "ExtractNode",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "HttpRequest",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "HttpFix",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "iterationException",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "PropertiesTypes",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "Gather",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "routeName",
+						"value": "JoinGather",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n        \"name\": \"Demo-Name\",\r\n        \"branch\": \"Demo-Field\",\r\n        \"mobileNo\": \"Demo-No\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://ng-0lv91kod.it-cpitrial06-rt.cfapps.us10-001.hana.ondemand.com/http/input",
+					"protocol": "https",
+					"host": [
+						"ng-0lv91kod",
+						"it-cpitrial06-rt",
+						"cfapps",
+						"us10-001",
+						"hana",
+						"ondemand",
+						"com"
+					],
+					"path": [
+						"http",
+						"input"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
