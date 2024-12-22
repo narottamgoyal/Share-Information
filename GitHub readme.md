@@ -1,4 +1,12 @@
-# GitHub Repository Splitting
+<details>
+    <summary>GitHub Repository Splitting</summary>
+
+## GitHub Repository Splitting
+
+> [!IMPORTANT]
+> Install Python
+
+## Prerequisite
 
 ```
 pip install git-filter-repo
@@ -30,3 +38,17 @@ pip install git-filter-repo
  git remote add splited-new-repo-local-name https://github.com/Infinite-demo/Split-3.git
  git push splited-new-repo-local-name main
 ```
+
+</details>
+
+<details>
+<summary>GitHub Markdown Cheat Sheet</summary>
+
+[The Ultimate Markdown Cheat Sheet](https://github.com/lifeparticle/Markdown-Cheatsheet)
+
+[Github markdown emoji](https://gist.github.com/rxaviers/7360908)
+
+</details>
+
+
+
