@@ -39,6 +39,28 @@ db.createUser({
 })
 ```
 
+**or**
+
+```
+use admin
+db.createUser({
+  user: "superadmin",
+  pwd: "password",
+  roles: [{ role: "root", db: "admin" }]
+})
+```
+
+>[!NOTE]
+> `root` Role
+>
+> The root role is the superuser role in MongoDB.
+>
+> A user with the root role has complete control over the MongoDB deployment, including:
+> * Managing users and roles (like userAdminAnyDatabase).
+> * Reading and writing to any database (like readWriteAnyDatabase).
+> * Performing administrative tasks on databases (like dbAdminAnyDatabase).
+> * Managing the cluster infrastructure (like clusterAdmin).
+
 ### Enable Authentication
 
 Stop the MongoDB server and start it again with the --auth option to enable authentication.
@@ -53,7 +75,7 @@ security:
   authorization: "enabled"
 ```
 
-### Connect with Authentication
+# Connect with Authentication
 
 Reconnect to MongoDB and select admin db along with the newly created user.
 
@@ -118,7 +140,34 @@ db.dropUser("userNameToDelete")
 
 You can reset it, but this process requires stopping the MongoDB server and restarting it in a special mode (--auth disabled) to reset the password. Or comment security section in **mongod.cfg**
 
-## Connection string
+
+### Alternative: Custom Role for Specific Database Patterns
+If you need a more restricted yet flexible approach (e.g., access to many but not all databases), you can create a custom role that applies to multiple databases matching specific criteria.
+
+```
+use admin
+db.createRole({
+  role: "customReadWriteRole",
+  privileges: [
+    { resource: { db: "db-b", collection: "" }, actions: ["readWrite"] },
+    { resource: { db: "db-c", collection: "" }, actions: ["readWrite"] },
+    // Add more databases here if needed
+  ],
+  roles: []
+})
+
+db.createUser({
+  user: "a",
+  pwd: "password_a",
+  roles: [
+    { role: "customReadWriteRole", db: "admin" }
+  ]
+})
+```
+
+# Connection string
+
+## Single Node
 
 User Created in **admin** Database
 
@@ -135,6 +184,39 @@ mongodb://<username>:<password>@<host>:<port>/<database>
 
 mongodb://dbUser:dbPassword@localhost:27017/myDatabase
 ```
+
+## Replica Set
+```
+mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>/<database>?replicaSet=<replicaSetName>&authSource=<admin_or_specificDb>
+```
+
+### Single Member Connection
+```
+mongodb://<username>:<password>@<primaryHost>:<primaryPort>/<database>?replicaSet=<replicaSetName>&authSource=<admin_or_specificDb>
+```
+
+### Full Replica Set Connection
+```
+mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>/<database>?replicaSet=<replicaSetName>&authSource=<admin_or_specificDb>
+```
+
+### C# Example
+```
+mongodb://X:password@host1:27017,host2:27017,host3:27017?replicaSet=rs0&readPreference=primaryPreferred&w=majority&authSource=admin_or_specificDb
+```
+
+```
+var connectionString = "mongodb://X:password@host1:27017,host2:27017,host3:27017?replicaSet=rs0&readPreference=primaryPreferred&w=majority";
+var client = new MongoClient(connectionString);
+
+// Specify the database to work with
+var database = client.GetDatabase("demo-db");  // Operations will happen on demo-db
+
+// Perform operations (e.g., read/write)
+var collection = database.GetCollection<BsonDocument>("myCollection");
+collection.InsertOne(new BsonDocument { { "name", "John" }, { "age", 30 } });
+```
+
 
 ## Robo 3t
 
