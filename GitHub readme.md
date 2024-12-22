@@ -1,7 +1,34 @@
-<details>
-    <summary>GitHub Repository Splitting</summary>
+<div id="back-to-top"></div>
 
-## GitHub Repository Splitting
+
+# Github Useful Commands
+
+<details> <summary>Commands</summary>
+
+## Deletes branch references to remote branches that do not exist
+```
+git remote prune origin
+```
+
+## Count the number of lines in all the files tracked by Git
+
+```
+git ls-files | xargs wc -l
+```
+
+## Count Only Specific File Types
+
+```
+git ls-files '*.js' '*.cs' | xargs wc -l
+```
+
+<div align="right">&#8673; <a href="#back-to-top" title="Table of Contents">Back to Top</a></div>
+
+</details>
+
+# GitHub Repository Splitting
+
+<details>  <summary>GitHub Repository Splitting</summary>
 
 > [!IMPORTANT]
 > Install Python
@@ -39,14 +66,21 @@ pip install git-filter-repo
  git push splited-new-repo-local-name main
 ```
 
+<div align="right">&#8673; <a href="#back-to-top" title="Table of Contents">Back to Top</a></div>
+
 </details>
 
-<details>
-<summary>GitHub Markdown Cheat Sheet</summary>
+# Markdown Cheat Sheet
+
+<details> <summary>GitHub Markdown Cheat Sheet</summary>
 
 [The Ultimate Markdown Cheat Sheet](https://github.com/lifeparticle/Markdown-Cheatsheet)
 
+[Quick Markdown Cheat Sheet](https://www.markdownguide.org/cheat-sheet/)
+
 [Github markdown emoji](https://gist.github.com/rxaviers/7360908)
+
+<div align="right">&#8673; <a href="#back-to-top" title="Table of Contents">Back to Top</a></div>
 
 </details>
 
