@@ -217,7 +217,6 @@ var collection = database.GetCollection<BsonDocument>("myCollection");
 collection.InsertOne(new BsonDocument { { "name", "John" }, { "age", 30 } });
 ```
 
-
 ## Robo 3t
 
 ![Robo-3t](./mongo-auth/robo-3t-1.png)

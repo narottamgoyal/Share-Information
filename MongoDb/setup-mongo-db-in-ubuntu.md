@@ -97,6 +97,10 @@
         ```
         sudo systemctl start mongod
         ```
+   - Restart
+        ```
+        sudo systemctl restart mongod
+        ```
 
 # Remove MongoDB
    - Stop the MongoDB Service
