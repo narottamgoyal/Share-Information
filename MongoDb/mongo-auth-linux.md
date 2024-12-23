@@ -51,7 +51,7 @@
     Select specific database
 
     ```
-    use TestDb
+    use test (TestDb)
     db.createUser({
     user: "testUser",
     pwd: "testPassword",

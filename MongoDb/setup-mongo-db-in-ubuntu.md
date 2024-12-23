@@ -89,6 +89,10 @@
         ```
 
 # Stop & Restart the MongoDB Service
+   - Status
+        ```
+        sudo systemctl status mongod
+        ```
    - Stop
         ```
         sudo systemctl stop mongod
@@ -129,3 +133,20 @@
         ```
         sudo apt-get autoremove
         ```
+
+
+# MongoDB is Bound to localhost Only (Below steps are only for testing)
+By default, MongoDB binds to localhost (127.0.0.1) for security reasons. To allow external access:
+
+Open the MongoDB configuration file
+
+```
+sudo nano /etc/mongod.conf
+```
+
+Look for the bindIp parameter and ensure it includes the VM's IP address (or 0.0.0.0 for all interfaces)
+
+```
+net:
+  bindIp: 127.0.0.1,133.133.3.133 (your VM IP)
+```
