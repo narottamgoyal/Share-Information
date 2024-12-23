@@ -61,10 +61,7 @@
     show dbs
     ```
 
-
-
-
-### Backup & Restore Mongo DB Data
+# Backup & Restore Mongo DB Data
    - Backup
         ```
         mongodump --out /path/to/backup/
@@ -74,7 +71,7 @@
         mongorestore /path/to/backup/
         ```
 
-### Optional Flags for Customization
+## Optional Flags for Customization
    - Backup a Single Database: Use the --db option
         ```
         mongodump --db <database_name> --out /path/to/backup
@@ -149,4 +146,8 @@ Look for the bindIp parameter and ensure it includes the VM's IP address (or 0.0
 ```
 net:
   bindIp: 127.0.0.1,133.133.3.133 (your VM IP)
+```
+Restart mongo db
+```
+sudo systemctl restart mongod
 ```

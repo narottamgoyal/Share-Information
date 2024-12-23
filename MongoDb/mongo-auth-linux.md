@@ -48,6 +48,12 @@
 
 - Create Additional Users in a **specific database**
 
+    ```
+    use admin
+    db.auth("adminUser","securePassword")
+    show dbs
+    ```
+
     Select specific database
 
     ```
