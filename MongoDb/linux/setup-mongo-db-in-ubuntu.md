@@ -35,7 +35,7 @@
         sudo systemctl status mongod
         ```
 
-# Run MongoDB Shell in linux Terminal
+# Install MongoDB Shell in linux Terminal
 -  Check if MongoDB Shell (mongosh) is Installed
     ```
     which mongosh
@@ -61,29 +61,26 @@
     show dbs
     ```
 
-# Backup & Restore Mongo DB Data
-   - Backup
-        ```
-        mongodump --out /path/to/backup/
-        ```
-   - Restore
-        ```
-        mongorestore /path/to/backup/
-        ```
+# Install mongodump
+- Check if MongoDB Tools are Installed
+     ```
+     mongodump --version
+     ```
+- Install MongoDB Database Tools
+     ```
+     wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo tee /etc/apt/trusted.gpg.d/mongodb.asc
+     echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+     ```
 
-## Optional Flags for Customization
-   - Backup a Single Database: Use the --db option
-        ```
-        mongodump --db <database_name> --out /path/to/backup
-        ```
-   - Backup a Single Collection: Use the --collection and --db options
-        ```
-        mongodump --db <database_name> --collection <collection_name> --out /path/to/backup
-        ```
-   - Authenticate if Needed: If your MongoDB instance requires authentication, include the --username and --password options
-        ```
-        mongodump --username <username> --password <password> --authenticationDatabase <auth_db> --out /path/to/backup
-        ```
+     ```
+     sudo apt update
+     sudo apt install mongodb-database-tools
+     mongodump --version
+     ```
+- Update Path (if needed)
+     ```
+     export PATH=$PATH:/path/to/mongodb/bin
+     ```
 
 # Stop & Restart the MongoDB Service
    - Status
