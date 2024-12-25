@@ -45,7 +45,7 @@ db.createUser({
 use admin
 db.createUser({
   user: "superadmin",
-  pwd: "password",
+  pwd: "superpassword",
   roles: [{ role: "root", db: "admin" }]
 })
 ```
@@ -82,6 +82,7 @@ Reconnect to MongoDB and select admin db along with the newly created user.
 ```
 use admin
 db.auth("adminUser","securePassword")
+db.auth("superadmin", "superpassword")
 ```
 
 - Granting Additional Roles to the **Admin User**, If required
@@ -133,7 +134,9 @@ db.updateUser("yourUser", { pwd: "yourPassword1" })
 
 ```
 use TestDb
-db.dropUser("userNameToDelete")
+db.dropUser("adminUser")
+db.dropUser("superadmin")
+db.dropUser("appuser")
 ```
 
 ## Forget the MongoDB admin password
@@ -163,6 +166,11 @@ db.createUser({
     { role: "customReadWriteRole", db: "admin" }
   ]
 })
+```
+
+```
+db.getRoles()
+db.dropRole("app-access-rule");
 ```
 
 # Connection string
