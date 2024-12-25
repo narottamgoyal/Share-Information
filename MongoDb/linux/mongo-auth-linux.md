@@ -41,7 +41,7 @@
     use admin
     db.createUser({
     user: "superadmin",
-    pwd: "password",
+    pwd: "superpassword",
     roles: [{ role: "root", db: "admin" }]
     })
     ```
