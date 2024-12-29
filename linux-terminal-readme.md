@@ -71,3 +71,37 @@ hostname -I: A quick and simple method to display the IP address.
 
 nmcli device show: Useful on systems that use NetworkManager.
 ```
+
+### Make the script executable
+
+```
+chmod +x path/script.sh
+```
+
+### Rename file
+sudo mv /etc/old_filename /etc/new_filename
+
+```
+sudo mv /etc/mongod.conf.bak.29122024-153742 /etc/mongod.conf
+```
+
+### Delete file
+```
+sudo rm /etc/filename
+```
+```
+sudo rm -r /etc/directory_name
+```
+```
+sudo rm /etc/mongod.conf
+```
+
+### Copy file from /etc to /home
+
+```
+sudo cp /etc/mongod.conf /home/ngoyal/MyWorkspace/MyApp
+```
+
+```
+sudo cp /home/ngoyal/MyWorkspace/MyApp/mongod.conf /etc
+```
