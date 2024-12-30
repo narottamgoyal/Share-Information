@@ -10,14 +10,26 @@ lsb_release -a
 uname -m
 ```
 
+### Change folder location to Downloads
+```
+cd ~/Downloads
+```
+
 ### Current folder location in termail
 ```
 pwd
 ```
 
-### Change folder location to Downloads
+### Open Folder from terminal
+
+Current Terminal location
 ```
-cd ~/Downloads
+xdg-open .
+```
+
+To any enter location is Terminal
+```
+xdg-open /home/ngoyal/MyWorkspace/MyApp
 ```
 
 ### Print all files and folders in Terminal
