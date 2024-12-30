@@ -105,3 +105,8 @@ sudo cp /etc/mongod.conf /home/ngoyal/MyWorkspace/MyApp
 ```
 sudo cp /home/ngoyal/MyWorkspace/MyApp/mongod.conf /etc
 ```
+
+### Check file exists
+```
+[ -e /path/to/your/file ] && echo "true" || echo "false"
+```
