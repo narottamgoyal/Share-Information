@@ -143,3 +143,65 @@ mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>?
 mongodb://app_user:app_password@192.168.0.105:27017?replicaSet=rs0&readPreference=primaryPreferred&w=majority&authSource=admin
 ```
 
+# Run secondary instance in the existing running ubuntu VM
+
+Create a New Data Directory
+```
+sudo mkdir -p /data/mongo3
+```
+
+Make sure the permissions are correct
+```
+sudo chown -R mongodb:mongodb /data/mongo3
+```
+
+Start MongoDB on Port 27020
+```
+sudo mongod --dbpath /data/mongo3 --port 27020 --fork --logpath /var/log/mongodb/mongo3.log
+```
+
+Start MongoDB on Port 27020, with replica set (make sure replSet name is same as your primary replica name)
+```
+sudo mongod --dbpath /data/mongo3 --port 27020 --fork --logpath /var/log/mongodb/mongo3.log --replSet rs0
+```
+
+Check if the New Instance is Running
+```
+ps aux | grep mongod
+```
+> output
+
+This instance is running on id `6882`
+```
+ngoyal@ngoyal-VirtualBox:~/MyWorkspace/MyApp$ ps aux | grep mongod
+
+root        6882  0.9  3.6 3705432 144420 ?      Sl   21:07   0:04 mongod --dbpath /data/mongo3 --port 27020 --fork --logpath /var/log/mongodb/mongo3.log
+
+mongodb     7127  2.5  4.9 2935520 198272 ?      Ssl  21:12   0:05 /usr/bin/mongod --config /etc/mongod.conf
+
+ngoyal      7278  0.0  0.0   9080  2432 pts/4    S+   21:15   0:00 grep --color=auto mongod
+```
+
+Connect to the New Instance
+```
+mongosh --port 27020
+```
+
+initiate replica set if required
+```
+rs.initiate()
+```
+
+Kill this secondary instance
+```
+sudo kill 6882
+```
+
+Now connect to primary mongodb node
+```
+mongosh
+use admin
+rs.add({ host: "127.0.0.1:27020", priority: 0, votes: 0 })
+rs.status()
+```
+
