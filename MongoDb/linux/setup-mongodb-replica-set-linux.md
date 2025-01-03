@@ -143,6 +143,19 @@ mongodb://<username>:<password>@<host1>:<port1>,<host2>:<port2>,<host3>:<port3>?
 mongodb://app_user:app_password@192.168.0.105:27017?replicaSet=rs0&readPreference=primaryPreferred&w=majority&authSource=admin
 ```
 
+## Remove secondary node (Execute from primary node)
+```
+use admin
+rs.status()
+rs.remove('127.0.0.1:27020')
+
+rs.status()
+use local
+db.system.replset.remove({})
+db.replset.election.drop()
+db.replset.minvalid.drop()
+```
+
 # Run secondary instance in the existing running ubuntu VM
 
 Create a New Data Directory
@@ -195,6 +208,11 @@ rs.initiate()
 Kill this secondary instance
 ```
 sudo kill 6882
+```
+
+Stop the process more forcefully
+```
+sudo kill -9 6882
 ```
 
 Now connect to primary mongodb node
