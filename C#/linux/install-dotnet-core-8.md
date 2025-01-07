@@ -44,3 +44,15 @@ dotnet --info
 ```
 
 # Test
+
+```
+dotnet App.API.dll
+```
+
+```
+dotnet App.API.dll --urls "http://0.0.0.0:8080"
+```
+
+```
+dotnet App.API.dll --urls "http://localhost:8080"
+```
