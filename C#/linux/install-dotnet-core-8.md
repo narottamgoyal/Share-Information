@@ -45,6 +45,15 @@ dotnet --info
 
 # Test
 
+## Create API Package
+- Publish
+  - Target Runtime: `linux-x64`
+  - Deployment Mode: `Self-contained`
+  - Configuration: `Release`
+  - Target Framework: `.NET 8`
+
+## Run API
+
 ```
 dotnet App.API.dll
 ```
