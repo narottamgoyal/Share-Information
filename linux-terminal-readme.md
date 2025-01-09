@@ -97,7 +97,7 @@ sudo mv /etc/old_filename /etc/new_filename
 sudo mv /etc/mongod.conf.bak.29122024-153742 /etc/mongod.conf
 ```
 
-### Delete file
+### Delete file or directory
 ```
 sudo rm /etc/filename
 ```
@@ -108,17 +108,43 @@ sudo rm -r /etc/directory_name
 sudo rm /etc/mongod.conf
 ```
 
-### Copy file from /etc to /home
+### Copy file or directory from /etc to /home
 
 ```
-sudo cp /etc/mongod.conf /home/ngoyal/MyWorkspace/MyApp
+sudo cp /etc/mongod.conf /home/ngoyal/MyWorkspace/MyApp/
 ```
 
 ```
-sudo cp /home/ngoyal/MyWorkspace/MyApp/mongod.conf /etc
+sudo cp /home/ngoyal/MyWorkspace/MyApp/mongod.conf /etc/
+```
+
+```
+sudo cp -r /home/ngoyal/MyWorkspace/MyApp/package/app-apis /opt/app-apis/
+```
+
+### Move file or directory
+
+```
+sudo mv /home/ngoyal/app-apis /opt/app-apis
 ```
 
 ### Check file exists
 ```
 [ -e /path/to/your/file ] && echo "true" || echo "false"
+```
+
+### Check Active Ports on the VM
+
+```
+sudo lsof -i -P -n | grep LISTEN
+```
+
+```
+sudo netstat -tuln | grep dotnet
+```
+
+### View systemd service logs
+
+```
+sudo journalctl -u serviceName.service -e
 ```
