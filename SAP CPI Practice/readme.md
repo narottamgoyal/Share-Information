@@ -1,10 +1,10 @@
-## Copy Message Body to property
+## Read Message Body
 
     ${in.body}
 
-## Copy data to property
+## Read property
 
-    ${property.p_Quote_Header}
+    ${property.p_nameOrSomething}
 
 ## Set Data type in property
 
@@ -39,6 +39,14 @@ Property can be null or empty
 
 ```
 ${property.skipRecordID} = '' or ${property.skipRecordID} = null
+```
+
+```
+${property.aa} = 'aa' or ${property.aa} = 'bb'
+```
+
+```
+${property.aa.toLowerCase()} = 'true'
 ```
 
 ```
