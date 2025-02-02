@@ -167,7 +167,7 @@ is needed.
 
 > Please press <Enter> after you've created and verified the record
 
-![create-txt-record](1.png)
+![create-txt-record](../1.png)
 
 ```
 [testadminapi.domain.com][173.201.75.28] No TXT records found

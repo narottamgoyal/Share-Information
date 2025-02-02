@@ -37,7 +37,7 @@ hostname -I: A quick and simple method to display the IP address.
 nmcli device show: Useful on systems that use NetworkManager.
 ```
 
-## Check Active Ports on the VM
+## Check Active Ports
 
 ```
 sudo lsof -i -P -n | grep LISTEN
@@ -46,6 +46,8 @@ sudo lsof -i -P -n | grep LISTEN
 ```
 sudo netstat -tuln | grep dotnet
 ```
+
+## Check Active Proces
 
 ### Find Process
 ```
@@ -64,7 +66,7 @@ sudo kill -9 693 6415
 cd ~/Downloads
 ```
 
-### Current folder location in termail
+### Current folder location in terminal
 ```
 pwd
 ```
