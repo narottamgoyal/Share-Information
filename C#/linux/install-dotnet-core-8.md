@@ -12,17 +12,6 @@ Verify Installation
 dotnet --version
 ```
 
-# Note : If process is blocked by some another process
-
-Find Process
-```
-ps aux | grep unattended-upgr
-```
-Kill all the proces(seprated by space)
-```
-sudo kill -9 693 6415
-```
-
 # Install dotnet core 8 Runtime Only
 Update Package Index: Ensure your package index is up-to-date by running
 ```
