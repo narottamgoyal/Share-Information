@@ -20,8 +20,14 @@ sudo ufw allow 'Nginx Full'
 
 ### Option 1
 ```
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d yourdomain.com
 ```
+
+```
+sudo certbot --nginx -d yourdomain.com --email youemail@gmail.com
+```
+
+_sudo certbot --nginx -d yourdomain.com --non-interactive --agree-tos --email youemail@gmail.com_
 
 ### Option 2 using TXT
 ```
