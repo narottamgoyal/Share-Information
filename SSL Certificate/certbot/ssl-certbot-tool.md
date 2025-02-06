@@ -26,9 +26,9 @@ sudo certbot --nginx -d yourdomain.com
 ```
 sudo certbot --nginx -d yourdomain.com --email youemail@gmail.com
 ```
-
-_sudo certbot --nginx -d yourdomain.com --non-interactive --agree-tos --email youemail@gmail.com_
-
+```
+sudo certbot --nginx -d yourdomain.com --non-interactive --agree-tos --email youemail@gmail.com
+```
 ### Option 2 using TXT
 ```
 sudo certbot certonly --manual --preferred-challenges dns
