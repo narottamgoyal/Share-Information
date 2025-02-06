@@ -18,6 +18,8 @@ sudo ufw allow 'Nginx Full'
 
 ## Request an SSL certificate
 
+> Make sure you have already created a valid A record for the requested domain pointing to the correct IP address.
+
 ### Option 1
 ```
 sudo certbot --nginx -d yourdomain.com
