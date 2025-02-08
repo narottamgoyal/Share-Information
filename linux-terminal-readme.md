@@ -175,3 +175,12 @@ chmod +x path/script.sh
 ```
 sudo journalctl -u serviceName.service -e
 ```
+
+# Convert the script's line endings from Windows format (CRLF) to Unix format (LF)
+> Error: bash: ./setup.sh: /bin/bash^M: bad interpreter: No such file or directory
+In Windows, the line endings are typically \r\n (carriage return + line feed), while in Linux, the line endings are just \n (line feed). The ^M character you see in the error (/bin/bash^M) is the carriage return (\r) that is not valid in Linux environments.
+
+To fix this issue, you need to convert the script's line endings from Windows format (CRLF) to Unix format (LF).
+```
+sed -i 's/\r//' setup.sh
+```
