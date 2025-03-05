@@ -18,11 +18,19 @@ sudo ufw allow 'Nginx Full'
 
 ## Request an SSL certificate
 
+> Make sure you have already created a valid A record for the requested domain pointing to the correct IP address.
+
 ### Option 1
 ```
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+sudo certbot --nginx -d yourdomain.com
 ```
 
+```
+sudo certbot --nginx -d yourdomain.com --email youemail@gmail.com
+```
+```
+sudo certbot --nginx -d yourdomain.com --non-interactive --agree-tos --email youemail@gmail.com
+```
 ### Option 2 using TXT
 ```
 sudo certbot certonly --manual --preferred-challenges dns
