@@ -37,6 +37,12 @@ hostname -I: A quick and simple method to display the IP address.
 nmcli device show: Useful on systems that use NetworkManager.
 ```
 
+## Check disk space information
+
+```
+df -h
+```
+
 ## Check Active Ports
 
 ```
