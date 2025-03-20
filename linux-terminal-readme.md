@@ -184,3 +184,15 @@ To fix this issue, you need to convert the script's line endings from Windows fo
 ```
 sed -i 's/\r//' setup.sh
 ```
+
+
+
+## Suggested Directory Structure
+
+```
+/opt/myapp-backend/       # Backend app code (e.g., Node.js, Python, etc.)
+/var/www/myapp/           # Frontend web files (HTML, CSS, JS)
+/etc/myapp/               # App configuration files (e.g., .env, config.json)
+/var/log/myapp/           # Logs for the web app
+/opt/myapp-backend/venv   # Python virtual environment (if applicable)
+```
