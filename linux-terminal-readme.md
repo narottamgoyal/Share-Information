@@ -71,6 +71,13 @@ cd ~/Downloads
 pwd
 ```
 
+> If above command will take you to /root
+> To go complete outside of this root folder then
+
+```
+ls /
+```
+
 ### Open Folder from terminal location
 
 ```

@@ -27,3 +27,16 @@ If you no longer want to store credentials, you can remove the credential helper
 ## Clone the Repository
 
     git clone https://github.com/username/repository-name.git
+
+
+## To show the changes in your Git repository
+
+    git diff
+
+## To discard changes in the working directory
+
+    git checkout -- .
+
+## To revert to the last commit completely
+
+    git reset --hard
