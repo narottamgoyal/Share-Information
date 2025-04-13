@@ -191,9 +191,6 @@ To fix this issue, you need to convert the script's line endings from Windows fo
 ```
 sed -i 's/\r//' setup.sh
 ```
-
-
-
 ## Suggested Directory Structure
 
 ```
@@ -202,4 +199,44 @@ sed -i 's/\r//' setup.sh
 /etc/myapp/               # App configuration files (e.g., .env, config.json)
 /var/log/myapp/           # Logs for the web app
 /opt/myapp-backend/venv   # Python virtual environment (if applicable)
+```
+
+## Disk Free Space & Usage Info
+
+### Disk Free Space
+
+```
+df -h
+```
+
+### Folder Size
+
+Current folder size
+```
+du -sh
+```
+
+Current folder & its sub folders size
+```
+du -h --max-depth=1
+```
+
+Specific folder size
+```
+du -sh /var/log
+```
+
+Specific folder & its sub folders size
+```
+du -h --max-depth=1 /path/to/folder
+```
+
+Top 5 highest folder size
+```
+du -h --max-depth=1 | sort -hr | head -n 5
+```
+
+Top 5 highest file size
+```
+find . -type f -exec du -h {} + | sort -hr | head -n 5
 ```
