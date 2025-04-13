@@ -191,6 +191,14 @@ To fix this issue, you need to convert the script's line endings from Windows fo
 ```
 sed -i 's/\r//' setup.sh
 ```
+
+## Seacrh text in all the files from a specific folder
+
+```
+grep -r '<text>' /etc/nginx/
+```
+
+
 ## Suggested Directory Structure
 
 ```
