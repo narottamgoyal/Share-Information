@@ -40,3 +40,28 @@ If you no longer want to store credentials, you can remove the credential helper
 ## To revert to the last commit completely
 
     git reset --hard
+
+## View local changed files names
+
+    git status
+
+## Stage all or few selected files
+```
+git add .
+```
+
+```
+git add <file path>
+```
+
+## Commit staged files
+
+```
+git commit -m "<message>"
+```
+
+## Push committed changes
+
+```
+git push
+```
