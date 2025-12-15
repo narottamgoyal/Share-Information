@@ -387,3 +387,15 @@ db.collectionName.createIndex(
    {unique: true, partialFilterExpression: {houseName: {$type: "string"}}}
 );
 ```
+
+### Update each document with its own property
+```
+db.collectionName.find().forEach(doc => {
+    if (doc.catalog && doc.catalog.length > 0 && doc.catalog[0].identifier) {
+        db.collectionName.updateOne(
+            { _id: doc._id },
+            { $set: { houseName: doc.catalog[0].identifier } }
+        );
+    }
+});
+```
