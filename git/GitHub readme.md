@@ -6,6 +6,19 @@
 <details> <summary>Commands</summary>
 
 ## Deletes branch references to remote branches that do not exist
+
+```
+git fetch --prune
+```
+
+or
+
+```
+git fetch -p
+```
+
+### Old command
+
 ```
 git remote prune origin
 ```
