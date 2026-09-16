@@ -1,0 +1,360 @@
+{
+	"info": {
+		"_postman_id": "e61d06c7-6895-46bc-b4e4-4319516d097a",
+		"name": "Ollama APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "37066169"
+	},
+	"item": [
+		{
+			"name": "OpenAI Format",
+			"item": [
+				{
+					"name": "Have a conversation (OpenAI API Format)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"qwen3:8b\",\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"What is an API?\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/v1/chat/completions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"v1",
+								"chat",
+								"completions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "embeddings (OpenAI API Format)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"nomic-embed-text\",\n  \"input\": \"What is an API?\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/v1/embeddings",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"v1",
+								"embeddings"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Start conversation",
+			"item": [
+				{
+					"name": "Have a conversation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"qwen3:8b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"What is an API?\"\n    }\n  ],\n  \"stream\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "1",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"qwen3:8b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to visit Goa.\"\n    }\n  ],\n  \"stream\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"qwen3:8b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to visit Goa.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Great! Goa is a popular destination. When are you planning to go?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Next month.\"\n    }\n  ],\n  \"stream\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "3",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"qwen3:8b\",\n    \"messages\": [\n        {\n            \"role\": \"user\",\n            \"content\": \"I want to visit Goa.\"\n        },\n        {\n            \"role\": \"assistant\",\n            \"content\": \"Great! Goa is a popular destination. When are you planning to go?\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": \"Next month.\"\n        },\n        {\n            \"role\": \"assistant\",\n            \"content\": \"Nice! How many days will you stay?\"\n        },\n        {\n            \"role\": \"user\",\n            \"content\": \"Five days.\"\n        }\n    ],\n    \"stream\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "4",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"qwen3:8b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to visit Goa.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Great! Goa is a popular destination. When are you planning to go?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Next month.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Nice! How many days will you stay?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Five days.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Five days is enough for a good Goa trip.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"I prefer beaches rather than nightlife.\"\n    }\n  ],\n  \"stream\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "5",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"model\": \"qwen3:8b\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": \"I want to visit Goa.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Great! Goa is a popular destination. When are you planning to go?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Next month.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Nice! How many days will you stay?\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Five days.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"Five days is enough for a good Goa trip.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"I prefer beaches rather than nightlife.\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"In that case, you may prefer quieter beach areas.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"So what area should I stay in?\"\n    }\n  ],\n  \"stream\": false\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:11434/api/chat",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "11434",
+							"path": [
+								"api",
+								"chat"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Give me an answer to the prompt",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"model\": \"qwen3:8b\",\n    \"prompt\": \"can you explain me the same thing in 10 word.\",\n    \"stream\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:11434/api/generate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "11434",
+					"path": [
+						"api",
+						"generate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Complete model details",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model\": \"qwen3:8b\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:11434/api/show",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "11434",
+					"path": [
+						"api",
+						"show"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "embed",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"model\": \"nomic-embed-text\",\n  \"input\": \"What is an API?\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:11434/api/embed",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "11434",
+					"path": [
+						"api",
+						"embed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "What model & capabilities I have",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:11434/api/tags",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "11434",
+					"path": [
+						"api",
+						"tags"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
