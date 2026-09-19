@@ -10,6 +10,7 @@ set -e
 #   ./python-env.sh --install 3.12
 #   ./python-env.sh --venv
 #   ./python-env.sh --requirements
+#   ./python-env.sh --freeze
 #   ./python-env.sh --activate
 #   ./python-env.sh --all
 #   ./python-env.sh --help
@@ -317,6 +318,34 @@ activate_virtualenv() {
 }
 
 # ------------------------------------------------------------
+# Freeze installed packages
+# ------------------------------------------------------------
+
+freeze_requirements() {
+    header "Freeze Requirements"
+
+    if [ ! -d "$VENV_DIR" ]; then
+        error "Virtual environment does not exist."
+        echo
+        echo "Create it first with:"
+        echo "  $0 --venv"
+        return 1
+    fi
+
+    info "Activating virtual environment..."
+
+    # shellcheck disable=SC1091
+    source "$VENV_DIR/bin/activate"
+
+    info "Freezing installed packages..."
+
+    python -m pip freeze > "$REQUIREMENTS_FILE"
+
+    success "requirements.txt generated successfully."
+    echo "  $REQUIREMENTS_FILE"
+}
+
+# ------------------------------------------------------------
 # Show help
 # ------------------------------------------------------------
 
@@ -355,6 +384,16 @@ Usage:
 
   $0 --activate
       Show the command needed to activate .venv.
+
+  $0 --freeze
+      Freeze installed packages from .venv
+      into requirements.txt.
+
+      Equivalent to:
+        pip freeze > requirements.txt
+
+      Example:
+        ./python-env.sh --freeze
 
   $0 --all VERSION
       Install Python, create .venv and install requirements.
@@ -415,9 +454,10 @@ interactive_menu() {
     echo "  2) Install Python version"
     echo "  3) Create virtual environment"
     echo "  4) Install requirements.txt"
-    echo "  5) Show activation command"
-    echo "  6) Do everything"
-    echo "  7) Exit"
+    echo "  5) Freeze installed packages"
+    echo "  6) Show activation command"
+    echo "  7) Do everything"
+    echo "  8) Exit"
     echo
 
     read -rp "Select [1-7]: " choice
@@ -455,10 +495,14 @@ interactive_menu() {
             ;;
 
         5)
-            activate_virtualenv
+            freeze_requirements
             ;;
 
         6)
+            activate_virtualenv
+            ;;
+
+        7)
             select_python_version || return
 
             if ! command_exists "python$SELECTED_PYTHON"; then
@@ -477,7 +521,7 @@ interactive_menu() {
             activate_virtualenv
             ;;
 
-        7)
+        8)
             echo "Bye!"
             exit 0
             ;;
@@ -527,6 +571,10 @@ case "${1:-}" in
 
     --requirements|-r)
         install_requirements
+        ;;
+    
+    --freeze|-f)
+        freeze_requirements
         ;;
 
     --activate|-a)
