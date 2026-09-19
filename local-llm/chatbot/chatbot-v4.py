@@ -2,8 +2,15 @@ import requests
 import json
 import os
 import re
+import sys
 import uuid
+from contextlib import contextmanager
 from datetime import datetime
+
+try:
+    import termios
+except ImportError:
+    termios = None
 
 
 MODEL = "qwen3:8b"
@@ -12,6 +19,11 @@ SYSTEM_PROMPT = "You are a helpful assistant."
 
 CONVERSATIONS_DIR = "conversations"
 MAX_CONTEXT_LENGTH = 32
+AUTO_SAVE_CONTEXT = "Auto-saved conversation"
+
+
+class StreamingCancelled(Exception):
+    """Raised when the user cancels an active Ollama response."""
 
 
 # ---------------------------------------------------------
@@ -20,6 +32,49 @@ MAX_CONTEXT_LENGTH = 32
 
 def now():
     return datetime.now().astimezone().isoformat(timespec="seconds")
+
+
+@contextmanager
+def lock_terminal_input():
+    """
+    Hide and discard normal terminal input while a reply streams.
+
+    Ctrl+C remains enabled so the user can cancel an active response.
+    Non-terminal input, such as piped test input, is left unchanged.
+    """
+
+    if termios is None or not sys.stdin.isatty():
+        yield
+        return
+
+    file_descriptor = sys.stdin.fileno()
+
+    try:
+        original_settings = termios.tcgetattr(file_descriptor)
+    except termios.error:
+        yield
+        return
+
+    locked_settings = original_settings.copy()
+    locked_settings[3] &= ~termios.ECHO
+
+    try:
+        # Discard input already typed before the stream began.
+        termios.tcflush(file_descriptor, termios.TCIFLUSH)
+        termios.tcsetattr(
+            file_descriptor,
+            termios.TCSADRAIN,
+            locked_settings
+        )
+        yield
+    finally:
+        # Ignore anything typed while the response was active.
+        termios.tcflush(file_descriptor, termios.TCIFLUSH)
+        termios.tcsetattr(
+            file_descriptor,
+            termios.TCSADRAIN,
+            original_settings
+        )
 
 
 def create_messages():
@@ -33,6 +88,13 @@ def create_messages():
 
 
 def sanitize_context(context):
+    """
+    Sanitize context only for use in filenames.
+
+    The original context is NOT modified when stored in the
+    conversation.
+    """
+
     context = context.strip()
 
     # Replace characters unsafe in filenames.
@@ -50,6 +112,7 @@ def sanitize_context(context):
 def create_conversation():
     """
     Create a new in-memory conversation.
+
     It is not saved until /save is used.
     """
 
@@ -87,6 +150,7 @@ Available commands:
   /save           Save/update conversation
   /load <number>  Load a saved conversation
   /list           List saved conversations
+  /retry          Retry the most recent failed message
 
   /exit           Exit the chatbot
   /quit           Exit the chatbot
@@ -117,7 +181,10 @@ def show_current(conversation):
         else:
             print("Status:      Saved")
     else:
-        print("Status:      Unsaved")
+        if conversation["dirty"]:
+            print("Status:      Unsaved changes")
+        else:
+            print("Status:      Unsaved")
 
     print()
 
@@ -146,6 +213,40 @@ def validate_messages(messages):
             return False
 
         if not isinstance(message.get("content"), str):
+            return False
+
+    return True
+
+
+def validate_conversation_data(data):
+    """
+    Validate the persisted conversation fields needed by the CLI.
+
+    Older files may omit metadata fields, but fields that are present
+    must have the expected type.
+    """
+
+    if not isinstance(data, dict):
+        return False
+
+    if "messages" not in data:
+        return False
+
+    if not validate_messages(data.get("messages", [])):
+        return False
+
+    for field in ("id", "model", "created_at", "updated_at"):
+        if field in data and not isinstance(data[field], str):
+            return False
+
+    context = data.get("context")
+    if context is not None and not isinstance(context, str):
+        return False
+
+    for message in data["messages"]:
+        if "timestamp" in message and not isinstance(
+            message["timestamp"], str
+        ):
             return False
 
     return True
@@ -180,9 +281,10 @@ def conversation_filename(conversation):
     if context:
         safe_context = sanitize_context(context)
 
-        # Include UUID so two conversations with the same
-        # context never overwrite one another.
-        return f"chat_{safe_context}_{conversation['id']}.json"
+        if safe_context:
+            # Include UUID so two conversations with the same
+            # context never overwrite one another.
+            return f"chat_{safe_context}_{conversation['id']}.json"
 
     return f"chat_{conversation['id']}.json"
 
@@ -216,7 +318,6 @@ def save_to_file(conversation):
         "messages": conversation["messages"]
     }
 
-    # Write atomically where possible.
     temp_filepath = filepath + ".tmp"
 
     try:
@@ -228,6 +329,7 @@ def save_to_file(conversation):
                 ensure_ascii=False
             )
 
+        # Replace existing file atomically where supported.
         os.replace(temp_filepath, filepath)
 
     except Exception:
@@ -246,19 +348,22 @@ def save_to_file(conversation):
     return filepath
 
 
-def list_conversations():
+def get_conversation_files():
+    """
+    Return saved conversation filenames sorted by most
+    recently updated conversation.
+
+    This function does not print anything.
+    """
+
     os.makedirs(CONVERSATIONS_DIR, exist_ok=True)
 
-    files = sorted(
-        file
-        for file in os.listdir(CONVERSATIONS_DIR)
-        if file.endswith(".json")
-        and not file.endswith(".tmp.json")
-    )
-
-    if not files:
-        print("\nNo saved conversations.\n")
-        return []
+    files = [
+        filename
+        for filename in os.listdir(CONVERSATIONS_DIR)
+        if filename.endswith(".json")
+        and not filename.endswith(".tmp.json")
+    ]
 
     conversations = []
 
@@ -269,21 +374,29 @@ def list_conversations():
             with open(filepath, "r", encoding="utf-8") as file:
                 data = json.load(file)
 
-            messages = data.get("messages", [])
+            if not validate_conversation_data(data):
+                raise ValueError("Invalid conversation structure")
 
-            if not validate_messages(messages):
-                raise ValueError("Invalid messages structure")
+            messages = data["messages"]
+
+            updated_at = data.get("updated_at", "Unknown")
 
             conversations.append({
                 "filename": filename,
                 "filepath": filepath,
                 "context": data.get("context") or "No context",
-                "updated_at": data.get("updated_at", "Unknown"),
+                "updated_at": updated_at,
                 "message_count": max(0, len(messages) - 1),
                 "valid": True
             })
 
-        except (json.JSONDecodeError, OSError, ValueError, TypeError):
+        except (
+            json.JSONDecodeError,
+            OSError,
+            ValueError,
+            TypeError,
+            AttributeError
+        ):
             conversations.append({
                 "filename": filename,
                 "filepath": filepath,
@@ -299,10 +412,27 @@ def list_conversations():
         reverse=True
     )
 
+    return conversations
+
+
+def list_conversations():
+    """
+    Print saved conversations.
+
+    Returns the ordered list of filenames.
+    """
+
+    conversations = get_conversation_files()
+
+    if not conversations:
+        print("\nNo saved conversations.\n")
+        return []
+
     print("\nSaved conversations:")
     print("--------------------")
 
     for index, conversation in enumerate(conversations, start=1):
+
         if not conversation["valid"]:
             print(
                 f"  {index}. "
@@ -323,30 +453,50 @@ def list_conversations():
 
 
 def load_conversation(number):
-    files = list_conversations()
+    """
+    Load a saved conversation by its displayed list number.
 
-    if not files:
+    Returns:
+        conversation dictionary on success
+        None on failure
+    """
+
+    conversations = get_conversation_files()
+
+    if not conversations:
+        print("\nNo saved conversations.\n")
         return None
 
     try:
         index = int(number) - 1
+    except ValueError:
+        print("Please provide a valid conversation number.")
+        return None
 
-        if index < 0 or index >= len(files):
-            print("Invalid conversation number.")
-            return None
+    if index < 0 or index >= len(conversations):
+        print("Invalid conversation number.")
+        return None
 
-        filename = files[index]
-        filepath = os.path.join(CONVERSATIONS_DIR, filename)
+    selected = conversations[index]
 
+    if not selected["valid"]:
+        print("Failed to load conversation: invalid file.")
+        return None
+
+    filepath = selected["filepath"]
+    filename = selected["filename"]
+
+    try:
         with open(filepath, "r", encoding="utf-8") as file:
             data = json.load(file)
 
-        messages = data.get("messages")
-
-        if not validate_messages(messages):
-            print("Failed to load conversation: invalid message structure.")
+        if not validate_conversation_data(data):
+            print(
+                "Failed to load conversation: invalid file structure."
+            )
             return None
 
+        messages = data["messages"]
         messages = normalize_loaded_messages(messages)
 
         # Ensure a system message exists.
@@ -380,11 +530,7 @@ def load_conversation(number):
 
         return conversation
 
-    except ValueError:
-        print("Please provide a valid conversation number.")
-        return None
-
-    except (json.JSONDecodeError, OSError, TypeError) as e:
+    except (json.JSONDecodeError, OSError, TypeError, AttributeError) as e:
         print(f"Failed to load conversation: {e}")
         return None
 
@@ -397,7 +543,10 @@ def ask_for_context():
     """
     Ask for a conversation context.
 
-    Returns sanitized context or None.
+    Returns the original context or None.
+
+    The context itself is NOT sanitized. Filename sanitization
+    happens separately when creating the filename.
     """
 
     while True:
@@ -412,8 +561,6 @@ def ask_for_context():
             )
             continue
 
-        context = sanitize_context(context)
-
         if not context:
             print("No context provided.")
             return None
@@ -425,12 +572,17 @@ def save_new_conversation(conversation):
     """
     Ask for context and save as a new conversation.
 
-    Returns True on success, False on failure/cancellation.
+    Returns True on success, False on failure.
     """
 
-    context = ask_for_context()
+    if conversation["context"] is None:
+        context = ask_for_context()
 
-    conversation["context"] = context
+        if context is None:
+            print("Save cancelled.\n")
+            return False
+
+        conversation["context"] = context
 
     try:
         filepath = save_to_file(conversation)
@@ -444,6 +596,50 @@ def save_new_conversation(conversation):
     print()
 
     return True
+
+
+def clone_conversation_as_new(conversation):
+    """
+    Create a completely new conversation using the current
+    conversation's messages.
+
+    Returns the new conversation, or None on failure.
+    """
+
+    context = ask_for_context()
+
+    if context is None:
+        print("Save as new cancelled.\n")
+        return None
+
+    new_conversation = {
+        "id": str(uuid.uuid4()),
+        "context": context,
+        "model": conversation["model"],
+        "created_at": now(),
+        "updated_at": now(),
+
+        # Deep copy without importing copy.
+        "messages": json.loads(
+            json.dumps(conversation["messages"])
+        ),
+
+        "filepath": None,
+        "dirty": True
+    }
+
+    try:
+        filepath = save_to_file(new_conversation)
+
+    except (OSError, TypeError) as e:
+        print(f"\nFailed to save conversation: {e}\n")
+        return None
+
+    print("\nNew conversation saved:")
+    print(filepath)
+    print()
+
+    return new_conversation
 
 
 def save_current_conversation(conversation):
@@ -491,42 +687,41 @@ def save_current_conversation(conversation):
 
         if choice == "2":
 
-            context = ask_for_context()
+            new_conversation = clone_conversation_as_new(
+                conversation
+            )
 
-            new_conversation = {
-                "id": str(uuid.uuid4()),
-                "context": context,
-                "model": conversation["model"],
-                "created_at": now(),
-                "updated_at": now(),
-
-                # Deep copy without importing copy.
-                "messages": json.loads(
-                    json.dumps(conversation["messages"])
-                ),
-
-                "filepath": None,
-                "dirty": True
-            }
-
-            try:
-                filepath = save_to_file(new_conversation)
-
-            except (OSError, TypeError) as e:
-                print(f"\nFailed to save conversation: {e}\n")
+            if new_conversation is None:
                 return False
 
             # The newly created conversation becomes current.
             conversation.clear()
             conversation.update(new_conversation)
 
-            print("\nNew conversation saved:")
-            print(filepath)
-            print()
-
             return True
 
         print("Please choose 1 or 2.")
+
+
+def auto_save_conversation(conversation):
+    """
+    Save without prompting for input.
+
+    New conversations receive a recognizable default context so an
+    interrupted request or exit can still be recovered from /list.
+    """
+
+    if not conversation["filepath"] and not conversation["context"]:
+        conversation["context"] = AUTO_SAVE_CONTEXT
+
+    try:
+        filepath = save_to_file(conversation)
+    except (OSError, TypeError) as e:
+        print(f"Automatic save failed: {e}")
+        return False
+
+    print(f"Conversation saved automatically: {filepath}")
+    return True
 
 
 # ---------------------------------------------------------
@@ -535,10 +730,10 @@ def save_current_conversation(conversation):
 
 def has_unsaved_changes(conversation):
     """
-    True only when changes have been made since the last save.
+    True when changes have been made since the last save.
     """
 
-    return conversation["dirty"]
+    return bool(conversation["dirty"])
 
 
 def confirm_new_conversation(conversation):
@@ -655,6 +850,7 @@ def send_to_ollama(conversation):
         requests exceptions
         RuntimeError
         json.JSONDecodeError
+        StreamingCancelled
     """
 
     api_messages = build_api_messages(conversation)
@@ -669,48 +865,57 @@ def send_to_ollama(conversation):
     stream_completed = False
 
     try:
-        with requests.post(
-            OLLAMA_URL,
-            json=payload,
-            stream=True,
-            timeout=120
-        ) as response:
+        with lock_terminal_input():
+            with requests.post(
+                OLLAMA_URL,
+                json=payload,
+                stream=True,
+                timeout=120
+            ) as response:
 
-            response.raise_for_status()
+                response.raise_for_status()
 
-            print("AI: ", end="", flush=True)
+                print("AI: ", end="", flush=True)
 
-            for line in response.iter_lines(decode_unicode=True):
+                for line in response.iter_lines(
+                    decode_unicode=True
+                ):
 
-                if not line:
-                    continue
+                    if not line:
+                        continue
 
-                data = json.loads(line)
+                    data = json.loads(line)
 
-                # Ollama can return an error object during streaming.
-                if "error" in data:
-                    raise RuntimeError(str(data["error"]))
+                    # Ollama can return an error object during streaming.
+                    if "error" in data:
+                        raise RuntimeError(str(data["error"]))
 
-                message = data.get("message", {})
+                    message = data.get("message", {})
 
-                if not isinstance(message, dict):
-                    continue
+                    if not isinstance(message, dict):
+                        continue
 
-                content = message.get("content", "")
+                    content = message.get("content", "")
 
-                if content:
-                    print(content, end="", flush=True)
-                    assistant_reply += content
+                    if content:
+                        print(content, end="", flush=True)
+                        assistant_reply += content
 
-                if data.get("done") is True:
-                    stream_completed = True
+                    if data.get("done") is True:
+                        stream_completed = True
 
-            print()
+                print()
+
+    except KeyboardInterrupt:
+        print("\n[Response cancelled -- partial response not saved]")
+        raise StreamingCancelled() from None
 
     except Exception:
         # Make sure the terminal moves to the next line if the
         # request failed halfway through streaming.
         if assistant_reply:
+            print("\n[Incomplete response -- not saved]")
+        else:
             print()
 
         raise
@@ -718,6 +923,11 @@ def send_to_ollama(conversation):
     if not stream_completed:
         raise RuntimeError(
             "Ollama stream ended before the response was complete."
+        )
+
+    if not assistant_reply:
+        raise RuntimeError(
+            "Ollama returned an empty response."
         )
 
     return assistant_reply
@@ -748,22 +958,35 @@ while True:
 
         if command in ["/exit", "/quit"]:
 
+            should_exit = True
+
             if has_unsaved_changes(conversation):
                 print("\nYou have unsaved changes.")
 
-                choice = input(
-                    "Save before exiting? [Y/n]: "
-                ).strip().lower()
+                while True:
+                    choice = input(
+                        "Save before exiting? [Y/n]: "
+                    ).strip().lower()
 
-                if choice in ["", "y", "yes"]:
-                    if not save_current_conversation(conversation):
-                        print(
-                            "Conversation could not be saved. "
-                            "Exiting anyway."
-                        )
+                    if choice in ["", "y", "yes"]:
+                        if not save_current_conversation(
+                            conversation
+                        ):
+                            print(
+                                "Conversation was not saved; "
+                                "you are still in the chatbot."
+                            )
+                            should_exit = False
 
-                elif choice not in ["n", "no"]:
-                    print("Exiting without saving.")
+                        break
+
+                    if choice in ["n", "no"]:
+                        break
+
+                    print("Please enter Y or N.")
+
+            if not should_exit:
+                continue
 
             print("Goodbye!")
             break
@@ -811,14 +1034,59 @@ while True:
         if command == "/clear":
 
             # Don't mark an already-empty conversation dirty.
-            current_messages = conversation["messages"]
+            if len(conversation["messages"]) > 1:
 
-            if len(current_messages) > 1:
                 conversation["messages"] = create_messages()
                 conversation["updated_at"] = now()
                 conversation["dirty"] = True
 
-            print("Conversation messages cleared.")
+                print("Conversation messages cleared.")
+
+            else:
+                print("Conversation is already empty.")
+
+            continue
+
+        # -------------------------------------------------
+        # Retry
+        # -------------------------------------------------
+
+        if command == "/retry":
+
+            if (
+                len(conversation["messages"]) <= 1
+                or conversation["messages"][-1]["role"] != "user"
+            ):
+                print("There is no failed message to retry.")
+                continue
+
+            try:
+                assistant_reply = send_to_ollama(conversation)
+
+                conversation["messages"].append({
+                    "role": "assistant",
+                    "content": assistant_reply,
+                    "timestamp": now()
+                })
+
+                conversation["updated_at"] = now()
+                conversation["dirty"] = True
+
+            except requests.exceptions.RequestException as e:
+                print(f"\nRetry failed: {e}")
+                auto_save_conversation(conversation)
+                print("Type /retry to try again, or enter a new message.\n")
+
+            except StreamingCancelled:
+                auto_save_conversation(conversation)
+                print("Response cancelled. You can type /retry "
+                      "or enter a new message.\n")
+
+            except (json.JSONDecodeError, RuntimeError) as e:
+                print(f"\nOllama retry failed: {e}")
+                auto_save_conversation(conversation)
+                print("Type /retry to try again, or enter a new message.\n")
+
             continue
 
         # -------------------------------------------------
@@ -841,7 +1109,6 @@ while True:
         # Load
         # -------------------------------------------------
 
-        # Only recognize /load or /load <number>.
         if command == "/load" or command.startswith("/load "):
 
             parts = user_input.split()
@@ -870,6 +1137,7 @@ while True:
             "timestamp": now()
         }
 
+        # Keep the user's message even if Ollama fails.
         conversation["messages"].append(user_message)
         conversation["updated_at"] = now()
         conversation["dirty"] = True
@@ -890,39 +1158,37 @@ while True:
         except requests.exceptions.RequestException as e:
 
             print(f"\nRequest failed: {e}")
+            auto_save_conversation(conversation)
+            print("Type /retry to send the same message again, "
+                  "or enter a new message.\n")
 
-            # Remove only the user message we just added.
-            if (
-                conversation["messages"]
-                and conversation["messages"][-1]["role"] == "user"
-            ):
-                conversation["messages"].pop()
-
-            # Restore dirty state based on remaining messages.
-            conversation["dirty"] = (
-                len(conversation["messages"]) > 1
-            )
+        except StreamingCancelled:
+            auto_save_conversation(conversation)
+            print("Response cancelled. Type /retry to send the same "
+                  "message again, or enter a new message.\n")
 
         except (json.JSONDecodeError, RuntimeError) as e:
 
             print(f"\nOllama response failed: {e}")
-
-            # Remove only the user message we just added.
-            if (
-                conversation["messages"]
-                and conversation["messages"][-1]["role"] == "user"
-            ):
-                conversation["messages"].pop()
-
-            conversation["dirty"] = (
-                len(conversation["messages"]) > 1
-            )
+            auto_save_conversation(conversation)
+            print("Type /retry to send the same message again, "
+                  "or enter a new message.\n")
 
     except KeyboardInterrupt:
+        print("\n")
+
+        if has_unsaved_changes(conversation):
+            auto_save_conversation(conversation)
+
         print("\n\nGoodbye!")
         break
 
     except EOFError:
+        print("\n")
+
+        if has_unsaved_changes(conversation):
+            auto_save_conversation(conversation)
+
         print("\n\nGoodbye!")
         break
 
