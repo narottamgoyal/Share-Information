@@ -1135,3 +1135,114 @@ Based on everything you've shown me:
 One important thing: we should not install all of this now. We'll build it incrementally and verify each checkpoint before moving forward. That way, if something breaks, we know exactly which layer caused it.
 
 Your hardware is already in very good shape, so Step 03 — LLM Runtime is the natural next step.
+
+
+----------------
+
+                  ┌─────────────────────┐
+                  │    VS Code          │
+                  │                     │
+                  │ Extension + UI      │
+                  └──────────┬──────────┘
+                             │
+                       HTTP / WebSocket
+                             │
+                             ↓
+                  ┌─────────────────────┐
+                  │     Agent Core      │
+                  │                     │
+                  │ Agent Engine        │
+                  │ Context / RAG       │
+                  │ Tools               │
+                  │ LLM                 │
+                  │ Storage / SQLite    │
+                  └──────────┬──────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ↓              ↓              ↓
+         Filesystem       Terminal         Git
+
+----------------
+
+Python + FastAPI.
+
+Your stack could be:
+
+Agent Core
+│
+├── Python
+├── FastAPI
+├── WebSocket
+├── Pydantic
+├── SQLAlchemy / SQLModel
+├── SQLite
+├── asyncio
+├── subprocess
+├── GitPython / subprocess Git
+├── RAG
+│   ├── embeddings
+│   ├── vector store
+│   └── retrieval
+└── LLM providers
+
+
+┌─────────────────────────────────────┐
+│          AGENT CORE SERVER          │
+│                                     │
+│  FastAPI                            │
+│  ├── REST API                       │
+│  └── WebSocket                      │
+│                                     │
+│  Agent Engine                       │
+│  ├── Agent Loop                     │
+│  ├── Agent Run / State              │
+│  ├── Context Manager                │
+│  └── Event Manager                  │
+│                                     │
+│  Tool System                        │
+│  ├── Permission Manager             │
+│  ├── Tool Registry                  │
+│  └── Tool Executor                  │
+│                                     │
+│  Providers                          │
+│  ├── FileSystem                     │
+│  ├── Terminal                       │
+│  ├── Git                            │
+│  ├── LLM                            │
+│  └── RAG                            │
+│                                     │
+│  Storage                            │
+│  └── SQLite                         |
+│                                     │
+└─────────────────────────────────────┘
+
+VS Code Extension: TypeScript + React
+
+Agent Core: Python + FastAPI + WebSocket
+
+Database: SQLite
+
+RAG: start simple, then introduce a vector store when needed
+
+Communication: REST for commands/configuration + WebSocket for streaming agent events
+
+The Agent Protocol, Workspace/Provider layer, Agent Run/State, Permission system, and event model are the pieces that bridge that gap.
+
+```
+Where each piece lives
+Capability	Where	Technology
+Workspace layer	Agent Core	Python interfaces/classes
+Filesystem provider	Agent Core	Python pathlib / os
+Terminal provider	Agent Core	Python subprocess / PTY
+Git provider	Agent Core	Git CLI / Python library
+Agent Run/State	Agent Core + SQLite	Python + SQLite
+Permission system	Agent Core	Python policy/approval layer
+Event model	Agent Core → Extension	WebSocket
+Agent loop	Agent Core	Python
+LLM integration	Agent Core	Python HTTP/SDK
+RAG	Agent Core	Python
+Conversation memory	SQLite	SQLite
+API	Agent Core	FastAPI
+Streaming	Agent Core → Extension	WebSocket
+UI	VS Code Extension	TypeScript + React
+```

@@ -349,7 +349,7 @@ Once the CLI version is solid, we could put a UI on top of it.
 For example:
 
 ┌──────────────────────────────────────────────┐
-│ Local LLM Chatbot                  qwen3:8b │
+│ Local LLM Chatbot                  qwen3:8b  │
 ├──────────────────────────────────────────────┤
 │                                              │
 │ You: Explain Docker                          │
