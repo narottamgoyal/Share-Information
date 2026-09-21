@@ -248,3 +248,18 @@ Top 5 highest file size
 ```
 find . -type f -exec du -h {} + | sort -hr | head -n 5
 ```
+
+### Ubuntu Package Repair & Cleanup
+
+```
+sudo dpkg --configure -a
+sudo apt --fix-broken install
+sudo apt autoremove
+sudo apt clean
+```
+
+Then check whether anything is still in a broken state:
+
+```
+dpkg -l | grep -E '^..r|^..U|^..F|^..H'
+```
