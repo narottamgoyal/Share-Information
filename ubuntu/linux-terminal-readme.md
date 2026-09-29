@@ -263,3 +263,9 @@ Then check whether anything is still in a broken state:
 ```
 dpkg -l | grep -E '^..r|^..U|^..F|^..H'
 ```
+
+### Split video into parts
+
+```
+D=$(ffprobe -v error -show_entries format=duration -of csv=p=0 'Hanuman ansh.mp4'); ffmpeg -i 'Hanuman ansh.mp4' -map 0 -c copy -f segment -segment_time $(awk "BEGIN {print $D/2}") -reset_timestamps 1 part_%d.mp4
+```
