@@ -1,6 +1,6 @@
 @echo off
 setlocal enabledelayedexpansion
-title Ultimate Python and Ollama Manager - Secured Edition
+title Ultimate Python and Ollama Manager - Transparent Edition
 
 :MAIN_MENU
 cls
@@ -74,6 +74,11 @@ echo     2. Python 3.11
 echo     3. Custom Version (Specify exact version string)
 echo     4. Back to Main Menu
 echo ---------------------------------------------------------------------
+echo [HINT] COMMANDS FOR MANUAL COPY-PASTE:
+echo     Option 1: winget install -e --id Python.Python.3.12 --accept-package-agreements --accept-source-agreements
+echo     Option 2: winget install -e --id Python.Python.3.11 --accept-package-agreements --accept-source-agreements
+echo     Option 3: winget install -e --id Python.Python.3.[VER] --version [VER] --accept-package-agreements --accept-source-agreements
+echo ---------------------------------------------------------------------
 set "py_choice=1"
 set /p py_choice="Choose an option (1-4) [Default: 1]: "
 
@@ -114,6 +119,11 @@ echo     3. Activate Virtual Env (Current Folder)
 echo     4. Activate Virtual Env (Custom Folder Path)
 echo     5. Back to Main Menu
 echo ---------------------------------------------------------------------
+echo [HINT] COMMANDS FOR MANUAL COPY-PASTE:
+echo     Option 1 / 2 (Create): python -m venv [PATH_TO_ENV_FOLDER]
+echo     Option 3 / 4 (Activate CMD): [PATH_TO_ENV_FOLDER]\Scripts\activate.bat
+echo     Option 3 / 4 (Activate PowerShell): [PATH_TO_ENV_FOLDER]\Scripts\Activate.ps1
+echo ---------------------------------------------------------------------
 set "venv_choice=1"
 set /p venv_choice="Choose an option (1-5) [Default: 1]: "
 
@@ -132,7 +142,7 @@ if "%venv_choice%"=="1" (
     )
     echo Setting up venv named '.venv' in current folder...
     python -m venv .venv
-    echo [+] Virtual environment '.venv' created successfully.
+    echo [SUCCESS] Virtual environment '.venv' created successfully.
     echo. & pause & goto SUB_VENV
 )
 
@@ -145,7 +155,7 @@ if "%venv_choice%"=="2" (
     
     if exist "!vpath!\!vname!" (
         echo.
-        echo [!] DANGER: The target folder "!vpath!\!vname!" already exists.
+        echo [WARNING] DANGER: The target folder "!vpath!\!vname!" already exists.
         set "confirm=N"
         set /p confirm="Do you want to permanently DELETE everything inside it? (Y/N) [Default: N]: "
         if /i not "!confirm!"=="Y" (
@@ -156,7 +166,7 @@ if "%venv_choice%"=="2" (
         rmdir /s /q "!vpath!\!vname!"
     )
     python -m venv "!vpath!\!vname!"
-    echo [+] Virtual environment created successfully at "!vpath!\!vname!".
+    echo [SUCCESS] Virtual environment created successfully at "!vpath!\!vname!".
     echo. & pause & goto SUB_VENV
 )
 
@@ -204,6 +214,10 @@ echo     2. Install from requirements.txt (Custom Folder Path)
 echo     3. Automatically update/generate requirements.txt (pip freeze)
 echo     4. Back to Main Menu
 echo ---------------------------------------------------------------------
+echo [HINT] COMMANDS FOR MANUAL COPY-PASTE:
+echo     Option 1 / 2 (Install): python -m pip install -r [PATH_TO_REQUIREMENTS.TXT]
+echo     Option 3 (Generate): python -m pip freeze ^> requirements.txt
+echo ---------------------------------------------------------------------
 set "reqs_choice=1"
 set /p reqs_choice="Choose an option (1-4) [Default: 1]: "
 
@@ -232,23 +246,21 @@ if "%reqs_choice%"=="2" (
 if "%reqs_choice%"=="3" (
     echo.
     if exist "requirements.txt" (
-        echo [!] Warning: A 'requirements.txt' file already exists here.
+        echo [WARNING] A 'requirements.txt' file already exists here.
         set "confirm=N"
         set /p confirm="Do you want to overwrite it? (Y/N) [Default: N]: "
         if /i not "!confirm!"=="Y" (
             echo [-] Aborted. File was not changed.
             echo. & pause & goto SUB_REQS
-        )
-    )
-    echo Generating/Updating requirements.txt via pip freeze...
-    python -m pip freeze > requirements.txt
-    echo [+] Current folder's requirements.txt updated!
-    echo. & pause & goto SUB_REQS
+)
+)
+echo Generating/Updating requirements.txt via pip freeze...
+python -m pip freeze > requirements.txt
+echo [SUCCESS] Current folder's requirements.txt updated!
+echo. & pause & goto SUB_REQS
 )
 if "%reqs_choice%"=="4" goto MAIN_MENU
 goto SUB_REQS
-
-
 :: =====================================================================
 :: 4. SUBMENU: OLLAMA AND MODELS
 :: =====================================================================
@@ -263,9 +275,12 @@ echo     2. Check Ollama Server Status and List Downloaded Models
 echo     3. Open Ollama Model Download Menu
 echo     4. Back to Main Menu
 echo ---------------------------------------------------------------------
+echo [HINT] COMMANDS FOR MANUAL COPY-PASTE:
+echo     Option 1: powershell -Command "irm ollama.com | iex"
+echo     Option 2 (List): ollama list
+echo ---------------------------------------------------------------------
 set "ollama_choice=2"
 set /p ollama_choice="Choose an option (1-4) [Default: 2]: "
-
 if "%ollama_choice%"=="1" (
 echo. & echo Executing official Ollama installation script...
 powershell -Command "irm ollama.com | iex"
@@ -273,7 +288,7 @@ echo. & pause & goto SUB_OLLAMA
 )
 if "%ollama_choice%"=="2" (
 echo. & echo Checking Ollama Server Status...
-powershell -Command "$resp = Invoke-WebRequest -Uri '127.0.0' -UseBasicParsing -ErrorAction SilentlyContinue; if ($resp.StatusCode -eq 200) { Write-Output '[+] Ollama server status: RUNNING' } else { Write-Output '[-] Ollama server status: NOT RUNNING' }"
+powershell -Command "$resp = Invoke-WebRequest -Uri '127.0.0' -UseBasicParsing -ErrorAction SilentlyContinue; if ($resp.StatusCode -eq 200) { Write-Output '[SUCCESS] Ollama server status: RUNNING' } else { Write-Output '[-] Ollama server status: NOT RUNNING' }"
 echo. & echo Currently Downloaded Models:
 ollama list 2>nul
 if %errorlevel% neq 0 echo Warning: Could not retrieve model list. Ensure Ollama is running.
@@ -298,6 +313,9 @@ echo     4. Gemma 2 (9B)      - Powerful Google model
 echo     5. Codegemma (7B)    - Optimized for programming
 echo     6. Custom            - Enter any other model from ollama.com
 echo     7. Back to Ollama Menu
+echo ---------------------------------------------------------------------
+echo [HINT] COMMANDS FOR MANUAL COPY-PASTE:
+echo     Pull Model: ollama pull [MODEL_NAME]
 echo ---------------------------------------------------------------------
 set "model_choice=1"
 set /p model_choice="Choose an option (1-7) [Default: 1]: "
